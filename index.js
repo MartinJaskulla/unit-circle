@@ -23,25 +23,29 @@ class Drawing {
     get sin() {
         return Math.sin(this.angle)
     }
+    get $sin() {
+        return this.sin * this.scale
+    }
 
     get cos() {
         return Math.cos(this.angle)
+    }
+    get $cos() {
+        return this.cos * this.scale
     }
 
     get sec() {
         return 1 / Math.cos(this.angle)
     }
-
-    get $sin() {
-        return this.sin * this.scale
-    }
-
-    get $cos() {
-        return this.cos * this.scale
-    }
-
     get $sec() {
         return this.sec * this.scale
+    }
+
+    get csc() {
+        return 1 / Math.sin(this.angle)
+    }
+    get $csc() {
+        return this.csc * this.scale
     }
 
     get $radius() {
@@ -52,51 +56,6 @@ class Drawing {
         this.update()
         const angleInput = document.getElementById("angle")
         angleInput.addEventListener("input", (e) => this.update(e.target.value))
-    }
-
-    drawCircle() {
-        ctx.beginPath();
-        ctx.lineWidth = this.thickness.circle
-        ctx.strokeStyle = this.colors.circle;
-        ctx.arc(this.centerX, this.centerY, this.$radius, 0, 2 * Math.PI);
-        ctx.stroke();
-        ctx.lineWidth = this.thickness.default
-    }
-
-    drawRadius() {
-        ctx.beginPath();
-        ctx.moveTo(this.centerX, this.centerY);
-        ctx.lineTo(this.centerX + this.$cos, this.centerY - this.$sin);
-        ctx.stroke();
-    }
-
-    drawCosine() {
-        ctx.beginPath();
-        ctx.globalAlpha = this.transparency;
-        ctx.strokeStyle = this.colors.sin;
-        ctx.moveTo(this.centerX, this.centerY - this.$sin);
-        ctx.lineTo(this.centerX + this.$cos, this.centerY - this.$sin);
-        ctx.stroke();
-        ctx.strokeStyle = this.colors.default;
-        ctx.globalAlpha = 1;
-    }
-
-    drawSine() {
-        ctx.beginPath();
-        ctx.strokeStyle = this.colors.sin;
-        ctx.moveTo(this.centerX + this.$cos, this.centerY);
-        ctx.lineTo(this.centerX + this.$cos, this.centerY - this.$sin);
-        ctx.stroke();
-        ctx.strokeStyle = this.colors.default;
-    }
-
-    drawSecant() {
-        ctx.beginPath();
-        ctx.strokeStyle = this.colors.sec;
-        ctx.moveTo(this.centerX, this.centerY);
-        ctx.lineTo(this.centerX + this.$sec, this.centerY);
-        ctx.stroke();
-        ctx.strokeStyle = this.colors.default;
     }
 
     drawCartesianPlane() {
@@ -112,6 +71,60 @@ class Drawing {
         ctx.lineWidth = this.thickness.default
     }
 
+    drawCircle() {
+        ctx.beginPath();
+        ctx.lineWidth = this.thickness.circle
+        ctx.strokeStyle = this.colors.circle;
+        ctx.arc(this.centerX, this.centerY, this.$radius, 0, 2 * Math.PI);
+        ctx.stroke();
+        ctx.lineWidth = this.thickness.default
+    }
+
+    drawSine() {
+        ctx.beginPath();
+        ctx.strokeStyle = this.colors.sin;
+        ctx.moveTo(this.centerX + this.$cos, this.centerY);
+        ctx.lineTo(this.centerX + this.$cos, this.centerY - this.$sin);
+        ctx.stroke();
+        ctx.strokeStyle = this.colors.default;
+    }
+    drawCosine() {
+        ctx.beginPath();
+        ctx.globalAlpha = this.transparency;
+        ctx.strokeStyle = this.colors.sin;
+        ctx.moveTo(this.centerX, this.centerY - this.$sin);
+        ctx.lineTo(this.centerX + this.$cos, this.centerY - this.$sin);
+        ctx.stroke();
+        ctx.strokeStyle = this.colors.default;
+        ctx.globalAlpha = 1;
+    }
+
+    drawSecant() {
+        ctx.beginPath();
+        ctx.globalAlpha = this.transparency;
+        ctx.strokeStyle = this.colors.sec;
+        ctx.moveTo(this.centerX, this.centerY);
+        ctx.lineTo(this.centerX + this.$sec, this.centerY);
+        ctx.stroke();
+        ctx.strokeStyle = this.colors.default;
+    }
+    drawCosecant() {
+        ctx.beginPath();
+        ctx.strokeStyle = this.colors.sec;
+        ctx.moveTo(this.centerX, this.centerY);
+        ctx.lineTo(this.centerX, this.centerY - this.$csc);
+        ctx.stroke();
+        ctx.strokeStyle = this.colors.default;
+        ctx.globalAlpha = 1;
+    }
+
+    drawRadius() {
+        ctx.beginPath();
+        ctx.moveTo(this.centerX, this.centerY);
+        ctx.lineTo(this.centerX + this.$cos, this.centerY - this.$sin);
+        ctx.stroke();
+    }
+
     update(angle) {
         this.angle = angle || 0
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -120,6 +133,7 @@ class Drawing {
         this.drawCosine()
         this.drawSine()
         this.drawSecant()
+        this.drawCosecant()
         this.drawRadius()
         ctx.stroke()
     }
