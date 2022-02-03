@@ -152,6 +152,19 @@ class Drawing {
         ctx.lineTo(this.$sec, 0);
         ctx.stroke();
         ctx.strokeStyle = this.colors.default;
+
+        const degrees = 30
+        // TODO use save and restore for colors etc and delete default values
+        ctx.save()
+        // ctx.rotate(degrees * Math.PI / 180);
+        // ctx.translate(0,0)
+        // ctx.fillRect((this.$cos + this.$sec) / 2, -this.$sin / 2, canvas.width, canvas.height)
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "center"
+        const text = "tangent"
+        ctx.measureText(text)
+        ctx.fillText(text, (this.$cos + this.$sec) / 2, -this.$sin / 2);
+        ctx.restore()
     }
 
     drawCotangent() {
