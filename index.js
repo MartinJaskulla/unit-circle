@@ -5,7 +5,6 @@ canvas.width = canvas.parentElement.offsetWidth;
 canvas.height = canvas.parentElement.offsetHeight;
 
 class Drawing {
-    angle = 0
     radius = 1
     scale = canvas.height / 4
     centerX = canvas.width / 2
@@ -23,9 +22,13 @@ class Drawing {
         circle: 3,
     }
     transparency = 0.5
+    theta = 0
+    get coTheta() {
+        return Math.PI / 2 - this.theta
+    }
 
     get sin() {
-        return Math.sin(this.angle)
+        return Math.sin(this.theta)
     }
 
     get $sin() {
@@ -33,7 +36,7 @@ class Drawing {
     }
 
     get cos() {
-        return Math.cos(this.angle)
+        return Math.cos(this.theta)
     }
 
     get $cos() {
@@ -41,7 +44,7 @@ class Drawing {
     }
 
     get sec() {
-        return 1 / Math.cos(this.angle)
+        return 1 / Math.cos(this.theta)
     }
 
     get $sec() {
@@ -49,7 +52,7 @@ class Drawing {
     }
 
     get csc() {
-        return 1 / Math.sin(this.angle)
+        return 1 / Math.sin(this.theta)
     }
 
     get $csc() {
@@ -153,17 +156,19 @@ class Drawing {
         ctx.stroke();
         ctx.strokeStyle = this.colors.default;
 
-        const degrees = 30
         // TODO use save and restore for colors etc and delete default values
         ctx.save()
-        // ctx.rotate(degrees * Math.PI / 180);
-        // ctx.translate(0,0)
-        // ctx.fillRect((this.$cos + this.$sec) / 2, -this.$sin / 2, canvas.width, canvas.height)
+        // Move the canvas origin (its top left corner) to the place where the text should be displayed
+        ctx.translate((this.$cos + this.$sec) / 2, -this.$sin / 2)
+        // .rotate() rotates the canvas around its origin
+        ctx.rotate(this.coTheta);
+        // Place the middle of the text above the origin
         ctx.textBaseline = "middle";
         ctx.textAlign = "center"
         const text = "tangent"
-        ctx.measureText(text)
-        ctx.fillText(text, (this.$cos + this.$sec) / 2, -this.$sin / 2);
+        ctx.fillText(text, 0, 0);
+        // To debug the translated and rotated canvas
+        // ctx.fillRect(0,0, canvas.width, canvas.height)
         ctx.restore()
     }
 
@@ -186,7 +191,7 @@ class Drawing {
     }
 
     update(angle) {
-        this.angle = angle || 0
+        this.theta = angle || 0
         ctx.clearRect(-this.centerX, -this.centerY, canvas.width, canvas.height);
         this.drawCartesianPlane()
         this.drawCircle()
