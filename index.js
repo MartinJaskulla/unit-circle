@@ -1,5 +1,8 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+console.log(canvas.parentElement)
+canvas.width = canvas.parentElement.offsetWidth;
+canvas.height = canvas.parentElement.offsetHeight;
 
 class Drawing {
     angle = 0

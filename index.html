@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <canvas width='600px' height='600px' id="canvas"></canvas>
+<div id="menu">
     <input type="range" id="angle" name="angle" min="0" max="6.28" value="0" step="0.01">
     <fieldset>
         <legend>Pi</legend>
@@ -34,6 +34,10 @@
             <label for="csv"><sup>4π</sup>&frasl;<sub>2</sub></label>
         </div>
     </fieldset>
-    <script src="index.js"></script>
+</div>
+<div>
+    <canvas id="canvas"></canvas>
+</div>
+<script src="index.js"></script>
 </body>
 </html>
