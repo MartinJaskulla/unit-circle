@@ -64,7 +64,7 @@ class Circle {
         ctx.stroke();
     }
 
-    drawHypotenuse() {
+    drawSin() {
         ctx.beginPath();
         ctx.moveTo(this.cos, this.centerY);
         ctx.lineTo(this.cos, this.sin);
@@ -80,7 +80,7 @@ class Circle {
         this.drawPointOnCircle()
         this.drawRadius()
         this.drawAdjacentSide()
-        this.drawHypotenuse()
+        this.drawSin()
         circle.drawCircle()
         ctx.stroke()
     }
