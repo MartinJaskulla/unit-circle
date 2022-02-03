@@ -4,48 +4,61 @@ const ctx = canvas.getContext('2d');
 const angleInput = document.getElementById("angle")
 angleInput.addEventListener("input", (e) => circle.update(e.target.value))
 
-class Circle {
+class Drawing {
     angle = 0
-    sin = 0
-    cos = 1
-    sec = 1
+    radius = 1
+    scale = canvas.height / 4
     centerX = canvas.width / 2
     centerY = canvas.height / 2
-    radius = canvas.height / 4
     lineWidth = 4
     strokeStyle = 'black'
 
-    drawCircle() {
-        // Circle
-        ctx.beginPath();
-        ctx.arc(this.centerX, this.centerY, this.radius, 0, 2 * Math.PI);
-        ctx.stroke();
-        // Center
-        ctx.beginPath();
-        ctx.arc(this.centerX, this.centerY, 1, 0, 2 * Math.PI);
-        ctx.stroke();
+    get sin() {
+        return Math.sin(this.angle)
     }
 
-    drawPointOnCircle() {
+    get cos() {
+        return Math.cos(this.angle)
+    }
+
+    get sec() {
+        return 1 / Math.cos(this.angle)
+    }
+
+    get $sin() {
+        return this.sin * this.scale
+    }
+
+    get $cos() {
+        return this.cos * this.scale
+    }
+
+    get $sec() {
+        return this.sec * this.scale
+    }
+
+    get $radius() {
+        return this.radius * this.scale
+    }
+
+    drawCircle() {
         ctx.beginPath();
-        ctx.lineWidth = this.lineWidth + 1
-        ctx.arc(this.cos, this.sin, 1, 0, 2 * Math.PI);
+        ctx.arc(this.centerX, this.centerY, this.$radius, 0, 2 * Math.PI);
         ctx.stroke();
-        ctx.lineWidth = this.lineWidth
     }
 
     drawRadius() {
         ctx.beginPath();
         ctx.moveTo(this.centerX, this.centerY);
-        ctx.lineTo(this.cos, this.sin);
+        ctx.lineTo(this.centerX + this.$cos, this.centerY - this.$sin);
         ctx.stroke();
     }
 
     drawCosine() {
         ctx.beginPath();
         ctx.strokeStyle = 'rgba(26,108,203,0.5)';
-        ctx.moveTo(this.centerX, this.sin);
-        ctx.lineTo(this.cos, this.sin);
+        ctx.moveTo(this.centerX, this.centerY - this.$sin);
+        ctx.lineTo(this.centerX + this.$cos, this.centerY - this.$sin);
         ctx.stroke();
         ctx.strokeStyle = this.strokeStyle;
     }
@@ -53,16 +66,17 @@ class Circle {
     drawSine() {
         ctx.beginPath();
         ctx.strokeStyle = '#1a6ccb';
-        ctx.moveTo(this.cos, this.centerY);
-        ctx.lineTo(this.cos, this.sin);
+        ctx.moveTo(this.centerX + this.$cos, this.centerY);
+        ctx.lineTo(this.centerX + this.$cos, this.centerY - this.$sin);
         ctx.stroke();
         ctx.strokeStyle = this.strokeStyle;
     }
+
     drawSecant() {
         ctx.beginPath();
         ctx.strokeStyle = '#15c219';
         ctx.moveTo(this.centerX, this.centerY);
-        ctx.lineTo(this.sec, this.centerY);
+        ctx.lineTo(this.centerX + this.$sec, this.centerY);
         ctx.stroke();
         ctx.strokeStyle = this.strokeStyle;
     }
@@ -84,12 +98,9 @@ class Circle {
         ctx.stroke();
         ctx.lineWidth = this.lineWidth
     }
+
     update(angle) {
         this.angle = angle
-        this.sin = this.centerY - Math.sin(this.angle) * this.radius
-        this.cos = this.centerX + Math.cos(this.angle) * this.radius
-        this.sec = this.centerX + (1 / Math.cos(this.angle)) * this.radius
-        console.log(this.sec)
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         this.styles()
         // this.drawPointOnCircle()
@@ -102,6 +113,7 @@ class Circle {
         ctx.stroke()
     }
 }
-const circle = new Circle()
+
+const circle = new Drawing()
 circle.update(0)
 
