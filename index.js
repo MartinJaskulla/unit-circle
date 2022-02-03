@@ -4,6 +4,24 @@ const ctx = canvas.getContext('2d');
 const angleInput = document.getElementById("angle")
 angleInput.addEventListener("input", (e) => circle.update(e.target.value))
 
+class CartesianPlane {
+    centerX = canvas.width / 2
+    centerY = canvas.height / 2
+    constructor() {
+        this.draw()
+    }
+    draw() {
+        ctx.beginPath();
+        // x-axis
+        ctx.moveTo(0, this.centerY);
+        ctx.lineTo(canvas.width, this.centerY);
+        // y-axis
+        ctx.moveTo(this.centerX, 0);
+        ctx.lineTo(this.centerX, canvas.height);
+        ctx.stroke();
+    }
+}
+
 class Circle {
     angle = 0
     sin = 0
@@ -58,6 +76,7 @@ class Circle {
         this.sin = this.centerY - Math.sin(this.angle) * this.radius
         this.cos = this.centerX + Math.cos(this.angle) * this.radius
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        new CartesianPlane()
         this.drawPointOnCircle()
         this.drawRadius()
         this.drawAdjacentSide()
