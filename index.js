@@ -8,6 +8,7 @@ class Circle {
     angle = 0
     sin = 0
     cos = 1
+    sec = 1
     centerX = canvas.width / 2
     centerY = canvas.height / 2
     radius = canvas.height / 4
@@ -57,6 +58,14 @@ class Circle {
         ctx.stroke();
         ctx.strokeStyle = this.strokeStyle;
     }
+    drawSecant() {
+        ctx.beginPath();
+        ctx.strokeStyle = '#15c219';
+        ctx.moveTo(this.centerX, this.centerY);
+        ctx.lineTo(this.sec, this.centerY);
+        ctx.stroke();
+        ctx.strokeStyle = this.strokeStyle;
+    }
 
     styles() {
         ctx.strokeStyle = this.strokeStyle
@@ -79,13 +88,16 @@ class Circle {
         this.angle = angle
         this.sin = this.centerY - Math.sin(this.angle) * this.radius
         this.cos = this.centerX + Math.cos(this.angle) * this.radius
+        this.sec = this.centerX + (1 / Math.cos(this.angle)) * this.radius
+        console.log(this.sec)
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         this.styles()
         // this.drawPointOnCircle()
         this.drawCartesianPlane()
-        this.drawRadius()
         this.drawCosine()
         this.drawSine()
+        this.drawSecant()
+        this.drawRadius()
         circle.drawCircle()
         ctx.stroke()
     }
