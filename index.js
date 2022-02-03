@@ -11,6 +11,7 @@ class Drawing {
         default: "#000000",
         sin: "#1a6ccb",
         sec: '#15c219',
+        tan: "#da0a0a",
         circle: "#ff8000",
     }
     thickness = {
@@ -46,6 +47,20 @@ class Drawing {
     }
     get $csc() {
         return this.csc * this.scale
+    }
+
+    get tan() {
+        return this.sin / this.cos
+    }
+    get $tan() {
+        return this.tan * this.scale
+    }
+
+    get cot() {
+        return this.cos / this.sin
+    }
+    get $cot() {
+        return this.cot * this.scale
     }
 
     get $radius() {
@@ -101,7 +116,6 @@ class Drawing {
 
     drawSecant() {
         ctx.beginPath();
-        ctx.globalAlpha = this.transparency;
         ctx.strokeStyle = this.colors.sec;
         ctx.moveTo(this.centerX, this.centerY);
         ctx.lineTo(this.centerX + this.$sec, this.centerY);
@@ -110,8 +124,28 @@ class Drawing {
     }
     drawCosecant() {
         ctx.beginPath();
+        ctx.globalAlpha = this.transparency;
         ctx.strokeStyle = this.colors.sec;
         ctx.moveTo(this.centerX, this.centerY);
+        ctx.lineTo(this.centerX, this.centerY - this.$csc);
+        ctx.stroke();
+        ctx.strokeStyle = this.colors.default;
+        ctx.globalAlpha = 1;
+    }
+
+    drawTangent() {
+        ctx.beginPath();
+        ctx.strokeStyle = this.colors.tan;
+        ctx.moveTo(this.centerX + this.$cos, this.centerY - this.$sin);
+        ctx.lineTo(this.centerX + this.$sec, this.centerY);
+        ctx.stroke();
+        ctx.strokeStyle = this.colors.default;
+    }
+    drawCotangent() {
+        ctx.beginPath();
+        ctx.globalAlpha = this.transparency;
+        ctx.strokeStyle = this.colors.tan;
+        ctx.moveTo(this.centerX + this.$cos, this.centerY - this.$sin);
         ctx.lineTo(this.centerX, this.centerY - this.$csc);
         ctx.stroke();
         ctx.strokeStyle = this.colors.default;
@@ -134,6 +168,8 @@ class Drawing {
         this.drawSine()
         this.drawSecant()
         this.drawCosecant()
+        this.drawTangent()
+        this.drawCotangent()
         this.drawRadius()
         ctx.stroke()
     }
