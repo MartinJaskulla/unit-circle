@@ -2,18 +2,15 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 const angleInput = document.getElementById("angle")
-angleInput.addEventListener("input", (e) => {
-    circle.update(() => circle.drawPointOnCircle(e.target.value))
-})
+angleInput.addEventListener("input", (e) => circle.update(e.target.value))
 
 class Circle {
+    angle = 0
+    sin = 0
+    cos = 1
     centerX = canvas.width / 2
     centerY = canvas.height / 2
     radius = canvas.height / 4
-
-    setDefaults() {
-        ctx.lineWidth = 1
-    }
 
     drawCircle() {
         ctx.strokeStyle = 'black';
@@ -23,31 +20,52 @@ class Circle {
         ctx.stroke();
         // Center
         ctx.beginPath();
-        ctx.arc(canvas.width / 2, canvas.height / 2, 1, 0, 2 * Math.PI);
+        ctx.arc(this.centerX, this.centerY, 1, 0, 2 * Math.PI);
         ctx.stroke();
     }
 
-    drawPointOnCircle(angle) {
+    drawPointOnCircle() {
         ctx.beginPath();
         ctx.lineWidth = 2
-        const x = canvas.width / 2 + Math.cos(angle / 100) * this.radius
-        const y = canvas.height / 2 - Math.sin(angle / 100) * this.radius
-        ctx.arc(x, y, 1, 0, 2 * Math.PI);
+        ctx.arc(this.cos, this.sin, 1, 0, 2 * Math.PI);
+        ctx.stroke();
+        ctx.lineWidth = 1
+    }
+
+    drawRadius() {
+        ctx.beginPath();
+        ctx.moveTo(this.centerX, this.centerY);
+        ctx.lineTo(this.cos, this.sin);
         ctx.stroke();
     }
 
-    update(...callbacks) {
+    drawAdjacentSide() {
+        ctx.beginPath();
+        ctx.moveTo(this.centerX, this.centerY);
+        ctx.lineTo(this.cos, this.centerY);
+        ctx.stroke();
+    }
+
+    drawHypotenuse() {
+        ctx.beginPath();
+        ctx.moveTo(this.cos, this.centerY);
+        ctx.lineTo(this.cos, this.sin);
+        ctx.stroke();
+    }
+
+    update(angle) {
+        this.angle = angle
+        this.sin = this.centerY - Math.sin(this.angle) * this.radius
+        this.cos = this.centerX + Math.cos(this.angle) * this.radius
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        callbacks.forEach(c => {
-            this.setDefaults()
-            c()
-        })
-        this.setDefaults()
+        this.drawPointOnCircle()
+        this.drawRadius()
+        this.drawAdjacentSide()
+        this.drawHypotenuse()
         circle.drawCircle()
         ctx.stroke()
     }
 }
-
 const circle = new Circle()
-circle.update(() => circle.drawPointOnCircle(0))
+circle.update(0)
 
