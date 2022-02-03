@@ -57,14 +57,14 @@ class Circle {
         ctx.stroke();
     }
 
-    drawAdjacentSide() {
+    drawCosine() {
         ctx.beginPath();
-        ctx.moveTo(this.centerX, this.centerY);
-        ctx.lineTo(this.cos, this.centerY);
+        ctx.moveTo(this.centerX, this.sin);
+        ctx.lineTo(this.cos, this.sin);
         ctx.stroke();
     }
 
-    drawSin() {
+    drawSine() {
         ctx.beginPath();
         ctx.moveTo(this.cos, this.centerY);
         ctx.lineTo(this.cos, this.sin);
@@ -79,8 +79,8 @@ class Circle {
         new CartesianPlane()
         this.drawPointOnCircle()
         this.drawRadius()
-        this.drawAdjacentSide()
-        this.drawSin()
+        this.drawCosine()
+        this.drawSine()
         circle.drawCircle()
         ctx.stroke()
     }
