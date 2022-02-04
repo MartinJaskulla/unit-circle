@@ -141,6 +141,7 @@ class Drawing {
 
     drawCosine() {
         this.drawSegment([0, -this.$sin], [this.$cos, -this.$sin], this.colors.sin, this.thickness.segments, this.transparency)
+        this.drawSegmentText([this.$cos / 2, -this.$sin], 0, this.sin >= 0 ? [0, -15] : [0, 15], "cosine", this.colors.sin)
     }
 
     drawSecant() {
