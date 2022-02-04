@@ -156,7 +156,7 @@ class Drawing {
 
     drawTangent() {
         this.drawSegment([this.$cos, -this.$sin], [this.$sec, 0], this.colors.tan, this.thickness.segments)
-        this.drawSegmentText([(this.$cos + this.$sec) / 2, -this.$sin / 2], this.coTheta, [0, -15], "tangent", this.colors.tan)
+        this.drawSegmentText([(this.$cos + this.$sec) / 2, -this.$sin / 2], this.coTheta, [0, -30], "tangent", this.colors.tan)
     }
 
     drawCotangent() {
