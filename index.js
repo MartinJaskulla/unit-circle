@@ -136,7 +136,7 @@ class Drawing {
 
     drawSine() {
         this.drawSegment([this.$cos, 0], [this.$cos, -this.$sin], this.colors.sin, this.thickness.segments)
-        this.drawSegmentText([this.$cos, -this.$sin / 2], this.cos >= 0 ? Math.PI / 2 : 3 * Math.PI / 2, [0, -15], "sine", this.colors.sin)
+        this.drawSegmentText([this.$cos, -this.$sin / 2], this.cos >= 0 ? Math.PI / 2 : -Math.PI / 2, [0, -15], "sine", this.colors.sin)
     }
 
     drawCosine() {
@@ -146,10 +146,12 @@ class Drawing {
 
     drawSecant() {
         this.drawSegment([0, 0], [this.$sec, 0], this.colors.sec, this.thickness.segments)
+        this.drawSegmentText([this.$sec / 2, 0], 0, [0, 15], "secant", this.colors.sec)
     }
 
     drawCosecant() {
         this.drawSegment([0, 0], [0, -this.$csc], this.colors.sec, this.thickness.segments, this.transparency)
+        this.drawSegmentText([0, -this.$csc / 2], this.cos >=0 ? - Math.PI / 2 : Math.PI / 2, [0, -15], "cosecant", this.colors.sec)
     }
 
     drawTangent() {
