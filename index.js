@@ -10,14 +10,13 @@ class Drawing {
     centerX = canvas.width / 2
     centerY = canvas.height / 2
     colors = {
-        default: "#000000",
         sin: "#1a6ccb",
         sec: '#15c219',
         tan: "#da0a0a",
         circle: "#ff8000",
     }
     thickness = {
-        default: 4,
+        segments: 4,
         cartesianPlane: 1,
         circle: 3,
     }
@@ -87,6 +86,7 @@ class Drawing {
     }
 
     drawCartesianPlane() {
+        ctx.save()
         ctx.beginPath();
         ctx.lineWidth = this.thickness.cartesianPlane
         // x-axis
@@ -96,67 +96,74 @@ class Drawing {
         ctx.moveTo(0, -this.centerY);
         ctx.lineTo(0, canvas.height);
         ctx.stroke();
-        ctx.lineWidth = this.thickness.default
+        ctx.restore()
     }
 
     drawCircle() {
+        ctx.save()
         ctx.beginPath();
         ctx.lineWidth = this.thickness.circle
         ctx.strokeStyle = this.colors.circle;
         ctx.arc(0, 0, this.$radius, 0, 2 * Math.PI);
         ctx.stroke();
-        ctx.lineWidth = this.thickness.default
+        ctx.restore()
     }
 
     drawSine() {
+        ctx.save()
         ctx.beginPath();
+        ctx.lineWidth = this.thickness.segments
         ctx.strokeStyle = this.colors.sin;
         ctx.moveTo(this.$cos, 0);
         ctx.lineTo(this.$cos, -this.$sin);
         ctx.stroke();
-        ctx.strokeStyle = this.colors.default;
+        ctx.restore()
     }
 
     drawCosine() {
+        ctx.save()
         ctx.beginPath();
+        ctx.lineWidth = this.thickness.segments
         ctx.globalAlpha = this.transparency;
         ctx.strokeStyle = this.colors.sin;
         ctx.moveTo(0, -this.$sin);
         ctx.lineTo(this.$cos, -this.$sin);
         ctx.stroke();
-        ctx.strokeStyle = this.colors.default;
-        ctx.globalAlpha = 1;
+        ctx.restore()
     }
 
     drawSecant() {
+        ctx.save()
         ctx.beginPath();
+        ctx.lineWidth = this.thickness.segments
         ctx.strokeStyle = this.colors.sec;
         ctx.moveTo(0, 0);
         ctx.lineTo(this.$sec, 0);
         ctx.stroke();
-        ctx.strokeStyle = this.colors.default;
+        ctx.restore()
     }
 
     drawCosecant() {
+        ctx.save()
         ctx.beginPath();
+        ctx.lineWidth = this.thickness.segments
         ctx.globalAlpha = this.transparency;
         ctx.strokeStyle = this.colors.sec;
         ctx.moveTo(0, 0);
         ctx.lineTo(0, -this.$csc);
         ctx.stroke();
-        ctx.strokeStyle = this.colors.default;
-        ctx.globalAlpha = 1;
+        ctx.restore()
     }
 
     drawTangent() {
+        ctx.save()
         ctx.beginPath();
+        ctx.lineWidth = this.thickness.segments
         ctx.strokeStyle = this.colors.tan;
         ctx.moveTo(this.$cos, -this.$sin);
         ctx.lineTo(this.$sec, 0);
         ctx.stroke();
-        ctx.strokeStyle = this.colors.default;
-
-        // TODO use save and restore for colors etc and delete default values
+        ctx.restore()
         ctx.save()
         // Move the canvas origin (its top left corner) to the place where the text should be displayed
         ctx.translate((this.$cos + this.$sec) / 2, -this.$sin / 2)
@@ -173,18 +180,20 @@ class Drawing {
     }
 
     drawCotangent() {
+        ctx.save()
         ctx.beginPath();
+        ctx.lineWidth = this.thickness.segments
         ctx.globalAlpha = this.transparency;
         ctx.strokeStyle = this.colors.tan;
         ctx.moveTo(this.$cos, -this.$sin);
         ctx.lineTo(0, -this.$csc);
         ctx.stroke();
-        ctx.strokeStyle = this.colors.default;
-        ctx.globalAlpha = 1;
+        ctx.restore()
     }
 
     drawRadius() {
         ctx.beginPath();
+        ctx.lineWidth = this.thickness.segments
         ctx.moveTo(0, 0);
         ctx.lineTo(this.$cos, -this.$sin);
         ctx.stroke();
@@ -202,7 +211,6 @@ class Drawing {
         this.drawTangent()
         this.drawCotangent()
         this.drawRadius()
-        ctx.stroke()
     }
 }
 
