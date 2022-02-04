@@ -161,6 +161,7 @@ class Drawing {
 
     drawCotangent() {
         this.drawSegment([this.$cos, -this.$sin], [0, -this.$csc], this.colors.tan, this.thickness.segments, this.transparency)
+        this.drawSegmentText([this.$cos / 2, (-this.$sin -this.$csc) / 2], this.coTheta, [0, -30], "cotangent", this.colors.tan)
     }
 
     drawRadius() {
@@ -182,4 +183,7 @@ class Drawing {
     }
 }
 
+console.log(
+
 new Drawing()
+)
