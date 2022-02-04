@@ -146,7 +146,7 @@ class Drawing {
 
     drawSecant() {
         this.drawSegment([0, 0], [this.$sec, 0], this.colors.sec, this.thickness.segments)
-        this.drawSegmentText([this.$sec / 2, 0], 0, [0, 15], "secant", this.colors.sec)
+        this.drawSegmentText([this.$sec / 2, 0], 0, this.sin >= 0 ? [0, 15] : [0, -15], "secant", this.colors.sec)
     }
 
     drawCosecant() {
