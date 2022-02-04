@@ -24,6 +24,7 @@ class Drawing {
     }
     transparency = 0.5
     theta = 0
+
     get coTheta() {
         return Math.PI / 2 - this.theta
     }
@@ -89,9 +90,9 @@ class Drawing {
 
     drawCartesianPlane() {
         // x-axis
-        this.drawSegment([-this.centerX, 0],[canvas.width, 0], this.colors.cartesianPlane)
+        this.drawSegment([-this.centerX, 0], [canvas.width, 0], this.colors.cartesianPlane)
         // y-axis
-        this.drawSegment([0, -this.centerY],[0, canvas.height], this.colors.cartesianPlane)
+        this.drawSegment([0, -this.centerY], [0, canvas.height], this.colors.cartesianPlane)
     }
 
     drawCircle() {
@@ -104,59 +105,63 @@ class Drawing {
         ctx.restore()
     }
 
-    drawSegment(moveTo, lineTo, strokeStyle, lineWidth = 1, globalAlpha = 1) {
+    drawSegment(moveTo, lineTo, color, width = 1, opacity = 1) {
         ctx.save()
         ctx.beginPath();
         ctx.moveTo(...moveTo);
         ctx.lineTo(...lineTo);
-        ctx.strokeStyle = strokeStyle;
-        ctx.lineWidth = lineWidth
-        ctx.globalAlpha = globalAlpha;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width
+        ctx.globalAlpha = opacity;
         ctx.stroke();
         ctx.restore()
     }
-    drawSine() {
-        this.drawSegment([this.$cos, 0],[this.$cos, -this.$sin],this.colors.sin, this.thickness.segments)
-    }
 
-    drawCosine() {
-        this.drawSegment([0, -this.$sin],[this.$cos, -this.$sin],this.colors.sin, this.thickness.segments, this.transparency)
-    }
-
-    drawSecant() {
-        this.drawSegment([0, 0],[this.$sec, 0],this.colors.sec, this.thickness.segments)
-    }
-
-    drawCosecant() {
-        this.drawSegment([0, 0],[0, -this.$csc],this.colors.sec, this.thickness.segments, this.transparency)
-    }
-
-    drawTangent() {
-        this.drawSegment([this.$cos, -this.$sin],[this.$sec, 0],this.colors.tan, this.thickness.segments)
-
+    drawSegmentText(translate, rotate, textOffset, text, color) {
         ctx.save()
         // Move the canvas origin (its top left corner) to the place where the text should be displayed
-        ctx.translate((this.$cos + this.$sec) / 2, -this.$sin / 2)
+        ctx.translate(...translate)
         // .rotate() rotates the canvas around its origin
-        ctx.rotate(this.coTheta);
+        ctx.rotate(rotate);
         // Place the middle of the text above the origin
         ctx.textBaseline = "middle";
         ctx.textAlign = "center"
         ctx.font = "15px Arial";
-        ctx.fillStyle = this.colors.tan;
-        const text = "tangent"
-        ctx.fillText(text, 0, -20);
+        ctx.fillStyle = color;
+        ctx.fillText(text, ...textOffset);
         // To debug the translated and rotated canvas
         // ctx.fillRect(0,0, canvas.width, canvas.height)
         ctx.restore()
     }
 
+    drawSine() {
+        this.drawSegment([this.$cos, 0], [this.$cos, -this.$sin], this.colors.sin, this.thickness.segments)
+        this.drawSegmentText([this.$cos, -this.$sin / 2], this.cos >= 0 ? Math.PI / 2 : 3 * Math.PI / 2, [0, -15], "sine", this.colors.sin)
+    }
+
+    drawCosine() {
+        this.drawSegment([0, -this.$sin], [this.$cos, -this.$sin], this.colors.sin, this.thickness.segments, this.transparency)
+    }
+
+    drawSecant() {
+        this.drawSegment([0, 0], [this.$sec, 0], this.colors.sec, this.thickness.segments)
+    }
+
+    drawCosecant() {
+        this.drawSegment([0, 0], [0, -this.$csc], this.colors.sec, this.thickness.segments, this.transparency)
+    }
+
+    drawTangent() {
+        this.drawSegment([this.$cos, -this.$sin], [this.$sec, 0], this.colors.tan, this.thickness.segments)
+        this.drawSegmentText([(this.$cos + this.$sec) / 2, -this.$sin / 2], this.coTheta, [0, -15], "tangent", this.colors.tan)
+    }
+
     drawCotangent() {
-        this.drawSegment([this.$cos, -this.$sin],[0, -this.$csc],this.colors.tan, this.thickness.segments, this.transparency)
+        this.drawSegment([this.$cos, -this.$sin], [0, -this.$csc], this.colors.tan, this.thickness.segments, this.transparency)
     }
 
     drawRadius() {
-        this.drawSegment([0, 0],[this.$cos, -this.$sin],this.colors.radius, this.thickness.segments)
+        this.drawSegment([0, 0], [this.$cos, -this.$sin], this.colors.radius, this.thickness.segments)
     }
 
     update(angle) {
