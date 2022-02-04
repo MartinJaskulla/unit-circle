@@ -14,6 +14,8 @@ class Drawing {
         sec: '#15c219',
         tan: "#da0a0a",
         circle: "#ff8000",
+        radius: "#000",
+        cartesianPlane: "#000"
     }
     thickness = {
         segments: 4,
@@ -86,17 +88,10 @@ class Drawing {
     }
 
     drawCartesianPlane() {
-        ctx.save()
-        ctx.beginPath();
-        ctx.lineWidth = this.thickness.cartesianPlane
         // x-axis
-        ctx.moveTo(-this.centerX, 0);
-        ctx.lineTo(canvas.width, 0);
+        this.drawSegment([-this.centerX, 0],[canvas.width, 0], this.colors.cartesianPlane)
         // y-axis
-        ctx.moveTo(0, -this.centerY);
-        ctx.lineTo(0, canvas.height);
-        ctx.stroke();
-        ctx.restore()
+        this.drawSegment([0, -this.centerY],[0, canvas.height], this.colors.cartesianPlane)
     }
 
     drawCircle() {
@@ -109,61 +104,36 @@ class Drawing {
         ctx.restore()
     }
 
-    drawSine() {
+    drawSegment(moveTo, lineTo, strokeStyle, lineWidth = 1, globalAlpha = 1) {
         ctx.save()
         ctx.beginPath();
-        ctx.lineWidth = this.thickness.segments
-        ctx.strokeStyle = this.colors.sin;
-        ctx.moveTo(this.$cos, 0);
-        ctx.lineTo(this.$cos, -this.$sin);
+        ctx.moveTo(...moveTo);
+        ctx.lineTo(...lineTo);
+        ctx.strokeStyle = strokeStyle;
+        ctx.lineWidth = lineWidth
+        ctx.globalAlpha = globalAlpha;
         ctx.stroke();
         ctx.restore()
+    }
+    drawSine() {
+        this.drawSegment([this.$cos, 0],[this.$cos, -this.$sin],this.colors.sin, this.thickness.segments)
     }
 
     drawCosine() {
-        ctx.save()
-        ctx.beginPath();
-        ctx.lineWidth = this.thickness.segments
-        ctx.globalAlpha = this.transparency;
-        ctx.strokeStyle = this.colors.sin;
-        ctx.moveTo(0, -this.$sin);
-        ctx.lineTo(this.$cos, -this.$sin);
-        ctx.stroke();
-        ctx.restore()
+        this.drawSegment([0, -this.$sin],[this.$cos, -this.$sin],this.colors.sin, this.thickness.segments, this.transparency)
     }
 
     drawSecant() {
-        ctx.save()
-        ctx.beginPath();
-        ctx.lineWidth = this.thickness.segments
-        ctx.strokeStyle = this.colors.sec;
-        ctx.moveTo(0, 0);
-        ctx.lineTo(this.$sec, 0);
-        ctx.stroke();
-        ctx.restore()
+        this.drawSegment([0, 0],[this.$sec, 0],this.colors.sec, this.thickness.segments)
     }
 
     drawCosecant() {
-        ctx.save()
-        ctx.beginPath();
-        ctx.lineWidth = this.thickness.segments
-        ctx.globalAlpha = this.transparency;
-        ctx.strokeStyle = this.colors.sec;
-        ctx.moveTo(0, 0);
-        ctx.lineTo(0, -this.$csc);
-        ctx.stroke();
-        ctx.restore()
+        this.drawSegment([0, 0],[0, -this.$csc],this.colors.sec, this.thickness.segments, this.transparency)
     }
 
     drawTangent() {
-        ctx.save()
-        ctx.beginPath();
-        ctx.lineWidth = this.thickness.segments
-        ctx.strokeStyle = this.colors.tan;
-        ctx.moveTo(this.$cos, -this.$sin);
-        ctx.lineTo(this.$sec, 0);
-        ctx.stroke();
-        ctx.restore()
+        this.drawSegment([this.$cos, -this.$sin],[this.$sec, 0],this.colors.tan, this.thickness.segments)
+
         ctx.save()
         // Move the canvas origin (its top left corner) to the place where the text should be displayed
         ctx.translate((this.$cos + this.$sec) / 2, -this.$sin / 2)
@@ -172,31 +142,21 @@ class Drawing {
         // Place the middle of the text above the origin
         ctx.textBaseline = "middle";
         ctx.textAlign = "center"
+        ctx.font = "15px Arial";
+        ctx.fillStyle = this.colors.tan;
         const text = "tangent"
-        ctx.fillText(text, 0, 0);
+        ctx.fillText(text, 0, -20);
         // To debug the translated and rotated canvas
         // ctx.fillRect(0,0, canvas.width, canvas.height)
         ctx.restore()
     }
 
     drawCotangent() {
-        ctx.save()
-        ctx.beginPath();
-        ctx.lineWidth = this.thickness.segments
-        ctx.globalAlpha = this.transparency;
-        ctx.strokeStyle = this.colors.tan;
-        ctx.moveTo(this.$cos, -this.$sin);
-        ctx.lineTo(0, -this.$csc);
-        ctx.stroke();
-        ctx.restore()
+        this.drawSegment([this.$cos, -this.$sin],[0, -this.$csc],this.colors.tan, this.thickness.segments, this.transparency)
     }
 
     drawRadius() {
-        ctx.beginPath();
-        ctx.lineWidth = this.thickness.segments
-        ctx.moveTo(0, 0);
-        ctx.lineTo(this.$cos, -this.$sin);
-        ctx.stroke();
+        this.drawSegment([0, 0],[this.$cos, -this.$sin],this.colors.radius, this.thickness.segments)
     }
 
     update(angle) {
