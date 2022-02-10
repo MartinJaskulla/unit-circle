@@ -19,6 +19,7 @@ function twoDecimals(number) {
 class Drawing {
     radius = 1
     scale = canvas.height / 4
+    angleCircleScale = 10
     centerX = canvas.width / 2
     centerY = canvas.height / 2
     colors = {
@@ -94,6 +95,7 @@ class Drawing {
     }
 
     constructor() {
+        // Place (0,0) at center of canvas
         ctx.translate(this.centerX, this.centerY)
         this.update()
         const angleInput = document.getElementById("angle")
@@ -133,6 +135,8 @@ class Drawing {
     }
 
     drawAngle() {
+        // - Add arrowhead
+        // - Or instead of "θ" show a "k" which stands for completed full rotations
         ctx.save()
         const largerThanFullCircle = Math.abs(this.theta) > Math.abs(2 * Math.PI)
 
@@ -143,15 +147,17 @@ class Drawing {
             ctx.save()
             ctx.beginPath();
             ctx.globalAlpha = this.transparency / 2
-            ctx.arc(0, 0, this.$radius / 10, -2 * Math.PI, 0);
+            ctx.arc(0, 0, this.$radius / this.angleCircleScale, -2 * Math.PI, 0);
             ctx.stroke();
             ctx.restore()
         }
 
         ctx.beginPath();
-        ctx.arc(0, 0, this.$radius / 10, -this.theta % (2 * Math.PI), 0,);
+        ctx.arc(0, 0, this.$radius / this.angleCircleScale, -this.theta % (2 * Math.PI), 0,);
         ctx.stroke();
 
+        // Rotation: When the radius is at 0 degrees, we want 90 degree rotation. 0 -> 90, 90 -> 45, 180 -> 0, 270 -> -45, 360 -> -90. So we start at 90 degree rotation and subtract half the angle of the radius.
+        this.drawSegmentText([Math.cos(this.theta / 2) * this.scale / this.angleCircleScale, -Math.sin(this.theta / 2) * this.scale / this.angleCircleScale], Math.PI / 2 - this.theta / 2, [0,-15], "θ", "black")
         ctx.restore()
     }
 
