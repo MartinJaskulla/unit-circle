@@ -4,6 +4,18 @@ const ctx = canvas.getContext('2d');
 canvas.width = canvas.parentElement.offsetWidth;
 canvas.height = canvas.parentElement.offsetHeight;
 
+function mapInfinityX(value) {
+    return Math.abs(value) === Infinity ? Math.sign(value) * canvas.width * 100 : value
+}
+
+function mapInfinityY(value) {
+    return Math.abs(value) === Infinity ? Math.sign(value) * canvas.height * 100 : value
+}
+
+function twoDecimals(number) {
+    return number.toString().slice(0, number < 0 ? 5 : 4)
+}
+
 class Drawing {
     radius = 1
     scale = canvas.height / 4
@@ -108,8 +120,8 @@ class Drawing {
     drawSegment(moveTo, lineTo, color, width = 1, opacity = 1) {
         ctx.save()
         ctx.beginPath();
-        ctx.moveTo(...moveTo);
-        ctx.lineTo(...lineTo);
+        ctx.moveTo(mapInfinityX(moveTo[0]), mapInfinityY(moveTo[1]));
+        ctx.lineTo(mapInfinityX(lineTo[0]), mapInfinityY(lineTo[1]));
         ctx.strokeStyle = color;
         ctx.lineWidth = width
         ctx.globalAlpha = opacity;
@@ -118,6 +130,7 @@ class Drawing {
     }
 
     drawSegmentText(translate, rotate, textOffset, text, color) {
+        if (translate.some(number => Math.abs(number) === Infinity)) return
         ctx.save()
         // Move the canvas origin (its top left corner) to the place where the text should be displayed
         ctx.translate(...translate)
@@ -136,32 +149,32 @@ class Drawing {
 
     drawSine() {
         this.drawSegment([this.$cos, 0], [this.$cos, -this.$sin], this.colors.sin, this.thickness.segments)
-        this.drawSegmentText([this.$cos, -this.$sin / 2], this.cos >= 0 ? Math.PI / 2 : -Math.PI / 2, [0, -15], "sine", this.colors.sin)
+        if (this.sin !== 0) this.drawSegmentText([this.$cos, -this.$sin / 2], this.cos >= 0 ? Math.PI / 2 : -Math.PI / 2, [0, -15], `sine (${twoDecimals(this.sin)})`, this.colors.sin)
     }
 
     drawCosine() {
         this.drawSegment([0, -this.$sin], [this.$cos, -this.$sin], this.colors.sin, this.thickness.segments, this.transparency)
-        this.drawSegmentText([this.$cos / 2, -this.$sin], 0, this.sin >= 0 ? [0, -15] : [0, 15], "cosine", this.colors.sin)
+        if (this.cos !== 0) this.drawSegmentText([this.$cos / 2, -this.$sin], 0, this.sin >= 0 ? [0, -15] : [0, 15], `cosine (${twoDecimals(this.cos)})`, this.colors.sin)
     }
 
     drawSecant() {
         this.drawSegment([0, 0], [this.$sec, 0], this.colors.sec, this.thickness.segments)
-        this.drawSegmentText([this.$sec / 2, 0], 0, this.sin >= 0 ? [0, 15] : [0, -15], "secant", this.colors.sec)
+        if (this.sec !== 0) this.drawSegmentText([this.$sec / 2, 0], 0, this.sin >= 0 ? [0, 15] : [0, -15], `secant (${twoDecimals(this.sec)})`, this.colors.sec)
     }
 
     drawCosecant() {
         this.drawSegment([0, 0], [0, -this.$csc], this.colors.sec, this.thickness.segments, this.transparency)
-        this.drawSegmentText([0, -this.$csc / 2], this.cos >=0 ? - Math.PI / 2 : Math.PI / 2, [0, -15], "cosecant", this.colors.sec)
+        if (this.csc !== 0) this.drawSegmentText([0, -this.$csc / 2], this.cos >= 0 ? -Math.PI / 2 : Math.PI / 2, [0, -15], `cosecant (${twoDecimals(this.csc)})`, this.colors.sec)
     }
 
     drawTangent() {
         this.drawSegment([this.$cos, -this.$sin], [this.$sec, 0], this.colors.tan, this.thickness.segments)
-        this.drawSegmentText([(this.$cos + this.$sec) / 2, -this.$sin / 2], this.coTheta, [0, -30], "tangent", this.colors.tan)
+        if (this.tan !== 0) this.drawSegmentText([(this.$cos + this.$sec) / 2, -this.$sin / 2], this.coTheta, [0, -30], `tangent (${twoDecimals(this.tan)})`, this.colors.tan)
     }
 
     drawCotangent() {
         this.drawSegment([this.$cos, -this.$sin], [0, -this.$csc], this.colors.tan, this.thickness.segments, this.transparency)
-        this.drawSegmentText([this.$cos / 2, (-this.$sin -this.$csc) / 2], this.coTheta, [0, -30], "cotangent", this.colors.tan)
+        if (this.cot !== 0) this.drawSegmentText([this.$cos / 2, (-this.$sin - this.$csc) / 2], this.coTheta, [0, -30], `cotangent (${twoDecimals(this.cot)})`, this.colors.tan)
     }
 
     drawRadius() {
@@ -183,7 +196,4 @@ class Drawing {
     }
 }
 
-console.log(
-
-new Drawing()
-)
+console.log(new Drawing())
