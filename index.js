@@ -100,6 +100,21 @@ class Drawing {
         angleInput.addEventListener("input", (e) => this.update(e.target.value))
     }
 
+    update(angle) {
+        this.theta = angle || 0
+        ctx.clearRect(-this.centerX, -this.centerY, canvas.width, canvas.height);
+        this.drawCartesianPlane()
+        this.drawCircle()
+        this.drawAngle()
+        this.drawCosine()
+        this.drawSine()
+        this.drawSecant()
+        this.drawCosecant()
+        this.drawTangent()
+        this.drawCotangent()
+        this.drawRadius()
+    }
+
     drawCartesianPlane() {
         // x-axis
         this.drawSegment([-this.centerX, 0], [canvas.width, 0], this.colors.cartesianPlane)
@@ -114,6 +129,29 @@ class Drawing {
         ctx.strokeStyle = this.colors.circle;
         ctx.arc(0, 0, this.$radius, 0, 2 * Math.PI);
         ctx.stroke();
+        ctx.restore()
+    }
+
+    drawAngle() {
+        ctx.save()
+        const largerThanFullCircle = Math.abs(this.theta) > Math.abs(2 * Math.PI)
+
+        ctx.lineWidth = this.thickness.circle
+        ctx.strokeStyle = this.colors.radius;
+
+        if (largerThanFullCircle) {
+            ctx.save()
+            ctx.beginPath();
+            ctx.globalAlpha = this.transparency / 2
+            ctx.arc(0, 0, this.$radius / 10, -2 * Math.PI, 0);
+            ctx.stroke();
+            ctx.restore()
+        }
+
+        ctx.beginPath();
+        ctx.arc(0, 0, this.$radius / 10, -this.theta % (2 * Math.PI), 0,);
+        ctx.stroke();
+
         ctx.restore()
     }
 
@@ -179,20 +217,6 @@ class Drawing {
 
     drawRadius() {
         this.drawSegment([0, 0], [this.$cos, -this.$sin], this.colors.radius, this.thickness.segments)
-    }
-
-    update(angle) {
-        this.theta = angle || 0
-        ctx.clearRect(-this.centerX, -this.centerY, canvas.width, canvas.height);
-        this.drawCartesianPlane()
-        this.drawCircle()
-        this.drawCosine()
-        this.drawSine()
-        this.drawSecant()
-        this.drawCosecant()
-        this.drawTangent()
-        this.drawCotangent()
-        this.drawRadius()
     }
 }
 
