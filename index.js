@@ -18,7 +18,8 @@ function twoDecimals(number) {
 
 class Drawing {
     radius = 1
-    dragRadiusNearPixel = 30
+    dragArea = 10
+    isDragging = false
     scale = canvas.height / 4
     angleCircleScale = 10
     centerX = canvas.width / 2
@@ -102,6 +103,7 @@ class Drawing {
         // const angleInput = document.getElementById("angle")
         // angleInput.addEventListener("input", (e) => this.update(e.target.value))
         this.dragRadius()
+        this.onDrag = this.onDrag.bind(this)
     }
 
     update(angle) {
@@ -137,6 +139,7 @@ class Drawing {
     }
 
     drawAngle() {
+        // TODO Support negative angles (dragging clockwise)
         // - https://www.desmos.com/calculator/n0m5r4rjha
         //      - Bigger inner circle with angle value
         //      - Reset to 0 after full rotation
@@ -235,29 +238,57 @@ class Drawing {
         this.drawSegment([0, 0], [this.$cos, -this.$sin], this.colors.radius, this.thickness.segments)
     }
 
+    isNearRadiusCircleIntersection(x, y) {
+        const xRange = [this.centerX + this.$cos - this.dragArea, this.centerX + this.$cos + this.dragArea]
+        const yRange = [this.centerY - this.$sin - this.dragArea, this.centerY - this.$sin + this.dragArea]
+        return xRange[0] < x && x < xRange[1] && yRange[0] < y && y < yRange[1]
+    }
+
     dragRadius() {
         document.addEventListener("mousemove", e => {
-            const radiusXRange = [this.centerX, this.centerX + this.$cos]
-            const xNearRadius = radiusXRange[0] < e.pageX && e.pageX < radiusXRange[1] // TODO Add tolerance
-
-            if (xNearRadius) {
-                const adjacent = e.pageX - this.centerX
-                const opposite = adjacent * this.tan
-                const yAbove = opposite - this.dragRadiusNearPixel
-                const yBelow = opposite + this.dragRadiusNearPixel
-                const y = this.centerY - e.pageY
-                const yNearRadius = yAbove < y && y < yBelow
-                if (yNearRadius) {
-                    document.body.style.cursor = "pointer"
-                } else {
-
-                    document.body.style.cursor = "default"
-                }
+            if (this.isDragging) return
+            if (this.isNearRadiusCircleIntersection(e.pageX, e.pageY)) {
+                document.body.style.cursor = "grab"
             } else {
                 document.body.style.cursor = "default"
             }
-
         })
+
+        document.addEventListener("mousedown", e => {
+            if (this.isNearRadiusCircleIntersection(e.pageX, e.pageY)) {
+                this.isDragging = true
+                document.body.style.cursor = "grabbing"
+                document.addEventListener("mousemove", this.onDrag)
+                document.addEventListener("mouseup", () => {
+                    this.isDragging = false
+                    document.body.style.cursor = "default"
+                    document.removeEventListener("mousemove", this.onDrag)
+                })
+            }
+        })
+    }
+
+    onDrag(e) {
+        const adjacent = e.pageX - this.centerX
+        const opposite = this.centerY - e.pageY
+        // Q1 adjacent+ opposite+
+        // Q2 adjacent- opposite+ -> Add 1 * Math.PI / 2
+        // Q3 adjacent- opposite- -> Add 2 * Math.PI / 2
+        // Q3 adjacent+ opposite- -> Add 3 * Math.PI / 2
+        const q1 = adjacent > 0 && opposite > 0
+        const q2 = adjacent < 0 && opposite > 0
+        const q3 = adjacent < 0 && opposite < 0
+        const q4 = adjacent > 0 && opposite < 0
+        const angle = Math.abs(Math.atan(opposite / adjacent))
+        if (q1) {
+            this.update(angle)
+        } else if (q2) {
+            this.update(Math.PI / 2 + Math.PI / 2 - angle)
+        } else if (q3) {
+            this.update(2 * Math.PI / 2 + angle)
+        } else if (q4) {
+            this.update(3 * Math.PI / 2 + Math.PI / 2 - angle)
+        }
     }
 }
 
