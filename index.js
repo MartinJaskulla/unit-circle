@@ -16,20 +16,21 @@ function twoDecimals(number) {
     return number.toString().slice(0, number < 0 ? 5 : 4)
 }
 
-// TODO Support negative angles (dragging clockwise). Need to know the previous angle. If we went from 0 to 359, then we have negative angle
-// - https://www.desmos.com/calculator/n0m5r4rjha
-//      - Bigger inner circle with angle value
-// - Draw a visual point to the drag handle and also in the centre and on the right just like here https://www.desmos.com/calculator/n0m5r4rjha
-// - Add arrowhead
-// - Or instead of "θ" show a "k" which stands for completed full rotations
-// - Settings menu to show, hide, copy values, segments
+/*
+TODO Support negative angles (dragging clockwise). Need to know the previous angle. If we went from 0 to 359, then we have negative angle
+- https://www.desmos.com/calculator/n0m5r4rjha
+- Bigger inner circle with angle value
+- Add arrowhead
+- Or instead of "θ" show a "k" which stands for completed full rotations
+- Settings menu to show, hide, copy values, segments
+*/
 
 class Drawing {
     radius = 1
-    angleRadius = 0.2
+    angleRadius = 0.15
     dragArea = 10
     isDragging = false
-    scale = canvas.height / 4
+    scale = canvas.height / 3.5
     centerX = canvas.width / 2
     centerY = canvas.height / 2
     colors = {
@@ -41,7 +42,7 @@ class Drawing {
         cartesianPlane: "#000"
     }
     thickness = {
-        segments: 4,
+        segments: 3,
         cartesianPlane: 1,
         circle: 3,
     }
@@ -120,6 +121,7 @@ class Drawing {
         this.drawCartesianPlane()
         this.drawCircle()
         this.drawAngle()
+        this.drawPoints()
         this.drawCosine()
         this.drawSine()
         this.drawSecant()
@@ -274,6 +276,10 @@ class Drawing {
         } else if (q4) {
             this.update(3 * Math.PI / 2 + Math.PI / 2 - angle)
         }
+    }
+
+    drawPoints() {
+        // TODO Draw a visual point to the drag handle and also in the centre and on the right just like here https://www.desmos.com/calculator/n0m5r4rjha
     }
 }
 
