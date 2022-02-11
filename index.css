@@ -5,15 +5,5 @@ html, body {
 
 body {
     height: 100vh;
-    display: grid;
-    grid-template-columns: 1fr 4fr;
-}
-
-#menu {
-    border: 1px solid black;
-}
-
-canvas {
-    display: block;
 }
 

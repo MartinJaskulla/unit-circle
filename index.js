@@ -18,6 +18,7 @@ function twoDecimals(number) {
 
 class Drawing {
     radius = 1
+    dragRadiusNearPixel = 30
     scale = canvas.height / 4
     angleCircleScale = 10
     centerX = canvas.width / 2
@@ -94,16 +95,17 @@ class Drawing {
         return this.radius * this.scale
     }
 
-    constructor() {
+    constructor(angle) {
         // Place (0,0) at center of canvas
         ctx.translate(this.centerX, this.centerY)
-        this.update()
-        const angleInput = document.getElementById("angle")
-        angleInput.addEventListener("input", (e) => this.update(e.target.value))
+        this.update(angle)
+        // const angleInput = document.getElementById("angle")
+        // angleInput.addEventListener("input", (e) => this.update(e.target.value))
+        this.dragRadius()
     }
 
     update(angle) {
-        this.theta = angle || 0
+        this.theta = angle
         ctx.clearRect(-this.centerX, -this.centerY, canvas.width, canvas.height);
         this.drawCartesianPlane()
         this.drawCircle()
@@ -135,8 +137,16 @@ class Drawing {
     }
 
     drawAngle() {
+        // - https://www.desmos.com/calculator/n0m5r4rjha
+        //      - Bigger inner circle with angle value
+        //      - Reset to 0 after full rotation
+        //      - With JS detect mouse position and if near the point, draw it bigger on canvas.
+        //        While user holds down mouse track position and change angle. Use trig from midpoint calculate
+        //        a right triangle x coordinates to mouse. y to mouse and then get theta
+        //        document.body.style.cursor = "pointer"
         // - Add arrowhead
         // - Or instead of "θ" show a "k" which stands for completed full rotations
+        //
         ctx.save()
         const largerThanFullCircle = Math.abs(this.theta) > Math.abs(2 * Math.PI)
 
@@ -157,7 +167,7 @@ class Drawing {
         ctx.stroke();
 
         // Rotation: When the radius is at 0 degrees, we want 90 degree rotation. 0 -> 90, 90 -> 45, 180 -> 0, 270 -> -45, 360 -> -90. So we start at 90 degree rotation and subtract half the angle of the radius.
-        this.drawSegmentText([Math.cos(this.theta / 2) * this.scale / this.angleCircleScale, -Math.sin(this.theta / 2) * this.scale / this.angleCircleScale], Math.PI / 2 - this.theta / 2, [0,-15], "θ", "black")
+        this.drawSegmentText([Math.cos(this.theta / 2) * this.scale / this.angleCircleScale, -Math.sin(this.theta / 2) * this.scale / this.angleCircleScale], Math.PI / 2 - this.theta / 2, [0, -15], "θ", "black")
         ctx.restore()
     }
 
@@ -224,6 +234,31 @@ class Drawing {
     drawRadius() {
         this.drawSegment([0, 0], [this.$cos, -this.$sin], this.colors.radius, this.thickness.segments)
     }
+
+    dragRadius() {
+        document.addEventListener("mousemove", e => {
+            const radiusXRange = [this.centerX, this.centerX + this.$cos]
+            const xNearRadius = radiusXRange[0] < e.pageX && e.pageX < radiusXRange[1] // TODO Add tolerance
+
+            if (xNearRadius) {
+                const adjacent = e.pageX - this.centerX
+                const opposite = adjacent * this.tan
+                const yAbove = opposite - this.dragRadiusNearPixel
+                const yBelow = opposite + this.dragRadiusNearPixel
+                const y = this.centerY - e.pageY
+                const yNearRadius = yAbove < y && y < yBelow
+                if (yNearRadius) {
+                    document.body.style.cursor = "pointer"
+                } else {
+
+                    document.body.style.cursor = "default"
+                }
+            } else {
+                document.body.style.cursor = "default"
+            }
+
+        })
+    }
 }
 
-console.log(new Drawing())
+console.log(new Drawing(Math.PI / 3))
