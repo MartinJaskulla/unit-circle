@@ -19,17 +19,17 @@ function twoDecimals(number) {
 // TODO Support negative angles (dragging clockwise). Need to know the previous angle. If we went from 0 to 359, then we have negative angle
 // - https://www.desmos.com/calculator/n0m5r4rjha
 //      - Bigger inner circle with angle value
-// - Draw a visual point to the drag handle
+// - Draw a visual point to the drag handle and also in the centre and on the right just like here https://www.desmos.com/calculator/n0m5r4rjha
 // - Add arrowhead
 // - Or instead of "θ" show a "k" which stands for completed full rotations
-//
+// - Settings menu to show, hide, copy values, segments
 
 class Drawing {
     radius = 1
+    angleRadius = 0.2
     dragArea = 10
     isDragging = false
     scale = canvas.height / 4
-    angleCircleScale = 10
     centerX = canvas.width / 2
     centerY = canvas.height / 2
     colors = {
@@ -148,26 +148,14 @@ class Drawing {
 
     drawAngle() {
         ctx.save()
-        const largerThanFullCircle = Math.abs(this.theta) > Math.abs(2 * Math.PI)
-
+        ctx.beginPath();
         ctx.lineWidth = this.thickness.circle
         ctx.strokeStyle = this.colors.radius;
-
-        if (largerThanFullCircle) {
-            ctx.save()
-            ctx.beginPath();
-            ctx.globalAlpha = this.transparency / 2
-            ctx.arc(0, 0, this.$radius / this.angleCircleScale, -2 * Math.PI, 0);
-            ctx.stroke();
-            ctx.restore()
-        }
-
-        ctx.beginPath();
-        ctx.arc(0, 0, this.$radius / this.angleCircleScale, -this.theta % (2 * Math.PI), 0,);
+        ctx.arc(0, 0, this.angleRadius * this.scale, -this.theta % (2 * Math.PI), 0,);
         ctx.stroke();
 
         // Rotation: When the radius is at 0 degrees, we want 90 degree rotation. 0 -> 90, 90 -> 45, 180 -> 0, 270 -> -45, 360 -> -90. So we start at 90 degree rotation and subtract half the angle of the radius.
-        this.drawSegmentText([Math.cos(this.theta / 2) * this.scale / this.angleCircleScale, -Math.sin(this.theta / 2) * this.scale / this.angleCircleScale], Math.PI / 2 - this.theta / 2, [0, -15], "θ", "black")
+        this.drawSegmentText([Math.cos(this.theta / 2) * this.scale * this.angleRadius, -Math.sin(this.theta / 2) * this.scale * this.angleRadius], Math.PI / 2 - this.theta / 2, [0, -15], "θ", "black")
         ctx.restore()
     }
 
