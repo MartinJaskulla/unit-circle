@@ -16,6 +16,14 @@ function twoDecimals(number) {
     return number.toString().slice(0, number < 0 ? 5 : 4)
 }
 
+// TODO Support negative angles (dragging clockwise). Need to know the previous angle. If we went from 0 to 359, then we have negative angle
+// - https://www.desmos.com/calculator/n0m5r4rjha
+//      - Bigger inner circle with angle value
+// - Draw a visual point to the drag handle
+// - Add arrowhead
+// - Or instead of "θ" show a "k" which stands for completed full rotations
+//
+
 class Drawing {
     radius = 1
     dragArea = 10
@@ -139,17 +147,6 @@ class Drawing {
     }
 
     drawAngle() {
-        // TODO Support negative angles (dragging clockwise)
-        // - https://www.desmos.com/calculator/n0m5r4rjha
-        //      - Bigger inner circle with angle value
-        //      - Reset to 0 after full rotation
-        //      - With JS detect mouse position and if near the point, draw it bigger on canvas.
-        //        While user holds down mouse track position and change angle. Use trig from midpoint calculate
-        //        a right triangle x coordinates to mouse. y to mouse and then get theta
-        //        document.body.style.cursor = "pointer"
-        // - Add arrowhead
-        // - Or instead of "θ" show a "k" which stands for completed full rotations
-        //
         ctx.save()
         const largerThanFullCircle = Math.abs(this.theta) > Math.abs(2 * Math.PI)
 
