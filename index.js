@@ -28,6 +28,7 @@ TODO Support negative angles (dragging clockwise). Need to know the previous ang
 class Drawing {
     radius = 1
     angleRadius = 0.15
+    pointRadius = 2
     dragArea = 10
     isDragging = false
     scale = canvas.height / 3.5
@@ -39,7 +40,7 @@ class Drawing {
         tan: "#da0a0a",
         circle: "#ff8000",
         radius: "#000",
-        cartesianPlane: "#000"
+        cartesianPlane: "#000",
     }
     thickness = {
         segments: 3,
@@ -109,9 +110,7 @@ class Drawing {
         // Place (0,0) at center of canvas
         ctx.translate(this.centerX, this.centerY)
         this.update(angle)
-        // const angleInput = document.getElementById("angle")
-        // angleInput.addEventListener("input", (e) => this.update(e.target.value))
-        this.dragRadius()
+        this.addDrag()
         this.onDrag = this.onDrag.bind(this)
     }
 
@@ -121,14 +120,15 @@ class Drawing {
         this.drawCartesianPlane()
         this.drawCircle()
         this.drawAngle()
-        this.drawPoints()
         this.drawCosine()
         this.drawSine()
         this.drawSecant()
         this.drawCosecant()
         this.drawTangent()
         this.drawCotangent()
-        this.drawRadius()
+        this.drawRadius(this.$cos, -this.$sin)
+        this.drawRadius(this.$radius, 0)
+        this.drawAnglePoints()
     }
 
     drawCartesianPlane() {
@@ -155,7 +155,8 @@ class Drawing {
         ctx.strokeStyle = this.colors.radius;
         ctx.arc(0, 0, this.angleRadius * this.scale, -this.theta % (2 * Math.PI), 0,);
         ctx.stroke();
-
+        // TODO Theta text / valuehas to be rendered above all segments like here: https://www.desmos.com/calculator/n0m5r4rjha
+        // TODO Change scale of drawing by dragging the right point like here https://www.desmos.com/calculator/n0m5r4rjha
         // Rotation: When the radius is at 0 degrees, we want 90 degree rotation. 0 -> 90, 90 -> 45, 180 -> 0, 270 -> -45, 360 -> -90. So we start at 90 degree rotation and subtract half the angle of the radius.
         this.drawSegmentText([Math.cos(this.theta / 2) * this.scale * this.angleRadius, -Math.sin(this.theta / 2) * this.scale * this.angleRadius], Math.PI / 2 - this.theta / 2, [0, -15], "θ", "black")
         ctx.restore()
@@ -221,20 +222,20 @@ class Drawing {
         if (this.cot !== 0) this.drawSegmentText([this.$cos / 2, (-this.$sin - this.$csc) / 2], this.coTheta, [0, -30], `cotangent (${twoDecimals(this.cot)})`, this.colors.tan)
     }
 
-    drawRadius() {
-        this.drawSegment([0, 0], [this.$cos, -this.$sin], this.colors.radius, this.thickness.segments)
+    drawRadius(x, y) {
+        this.drawSegment([0, 0], [x, y], this.colors.radius, this.thickness.segments)
     }
 
-    isNearRadiusCircleIntersection(x, y) {
+    isNearDrag(x, y) {
         const xRange = [this.centerX + this.$cos - this.dragArea, this.centerX + this.$cos + this.dragArea]
         const yRange = [this.centerY - this.$sin - this.dragArea, this.centerY - this.$sin + this.dragArea]
         return xRange[0] < x && x < xRange[1] && yRange[0] < y && y < yRange[1]
     }
 
-    dragRadius() {
+    addDrag() {
         document.addEventListener("mousemove", e => {
             if (this.isDragging) return
-            if (this.isNearRadiusCircleIntersection(e.pageX, e.pageY)) {
+            if (this.isNearDrag(e.pageX, e.pageY)) {
                 document.body.style.cursor = "grab"
             } else {
                 document.body.style.cursor = "default"
@@ -242,7 +243,7 @@ class Drawing {
         })
 
         document.addEventListener("mousedown", e => {
-            if (this.isNearRadiusCircleIntersection(e.pageX, e.pageY)) {
+            if (this.isNearDrag(e.pageX, e.pageY)) {
                 this.isDragging = true
                 document.body.style.cursor = "grabbing"
                 document.addEventListener("mousemove", this.onDrag)
@@ -278,8 +279,35 @@ class Drawing {
         }
     }
 
-    drawPoints() {
-        // TODO Draw a visual point to the drag handle and also in the centre and on the right just like here https://www.desmos.com/calculator/n0m5r4rjha
+    addPoint(x, y) {
+        ctx.save()
+        ctx.beginPath();
+        ctx.lineWidth = this.thickness.circle
+        ctx.strokeStyle = this.colors.radius;
+        ctx.fillStyle = this.colors.radius;
+        ctx.arc(x, y, this.pointRadius, 0, 2 * Math.PI);
+        ctx.stroke()
+        ctx.fill();
+        ctx.restore()
+
+        ctx.save()
+        ctx.beginPath();
+        ctx.lineWidth = this.thickness.circle
+        ctx.fillStyle = this.colors.radius;
+        ctx.globalAlpha = 0.2
+        ctx.arc(x, y, this.pointRadius * 5, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.restore()
+    }
+
+    // TODO Centre point should drag whole circle
+    drawAnglePoints() {
+        // Drag handle
+        this.addPoint(this.$cos, -this.$sin)
+        // Centre
+        this.addPoint(0, 0)
+        // Third
+        this.addPoint(this.$radius, 0)
     }
 }
 
