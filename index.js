@@ -107,11 +107,14 @@ class Drawing {
     }
 
     constructor(angle) {
+        this.onRadiusDrag = this.onRadiusDrag.bind(this)
+        this.onCentreDrag = this.onCentreDrag.bind(this)
+        this.onSizeDrag = this.onSizeDrag.bind(this)
+        this.addDragToPoints = this.addDragToPoints.bind(this)
         // Place (0,0) at center of canvas
         ctx.translate(this.centerX, this.centerY)
         this.update(angle)
-        this.addDrag()
-        this.onDrag = this.onDrag.bind(this)
+        this.addDragToPoints()
     }
 
     update(angle) {
@@ -226,39 +229,51 @@ class Drawing {
         this.drawSegment([0, 0], [x, y], this.colors.radius, this.thickness.segments)
     }
 
-    isNearDrag(x, y) {
-        const xRange = [this.centerX + this.$cos - this.dragArea, this.centerX + this.$cos + this.dragArea]
-        const yRange = [this.centerY - this.$sin - this.dragArea, this.centerY - this.$sin + this.dragArea]
-        return xRange[0] < x && x < xRange[1] && yRange[0] < y && y < yRange[1]
+    isNear(pointA, pointB) {
+        const xRange = [this.centerX + pointA[0] - this.dragArea, this.centerX + pointA[0] + this.dragArea]
+        const yRange = [this.centerY - pointA[1] - this.dragArea, this.centerY - pointA[1] + this.dragArea]
+        return xRange[0] < pointB[0] && pointB[0] < xRange[1] && yRange[0] < pointB[1] && pointB[1] < yRange[1]
     }
 
-    addDrag() {
+    addDragToPoints() {
+        const radiusDrag = [() => [this.$cos, this.$sin], "grab", "grabbing", this.onRadiusDrag]
+        const centreDrag = [() => [0, 0], "move", "move", this.onCentreDrag]
+        const sizeDrag = [() => [this.$radius, 0], "ns-resize", "ns-resize", this.onSizeDrag]
+
+        this.addDragEvents(...radiusDrag)
+        // this.addDragEvents(...centreDrag)
+        // this.addDragEvents(...sizeDrag)
+    }
+
+    addDragEvents(getPoint, cursorStyleHover, cursorStyleDragging, callback) {
         document.addEventListener("mousemove", e => {
             if (this.isDragging) return
-            if (this.isNearDrag(e.pageX, e.pageY)) {
-                document.body.style.cursor = "grab"
+            if (this.isNear(getPoint(), [e.pageX, e.pageY])) {
+                document.body.style.cursor = cursorStyleHover
             } else {
+                // TODO Only if not near any of the 3. Maybe a field on the class dragPoints=[x,y,callback]
                 document.body.style.cursor = "default"
             }
         })
 
         document.addEventListener("mousedown", e => {
-            if (this.isNearDrag(e.pageX, e.pageY)) {
+            if (this.isNear(getPoint(), [e.pageX, e.pageY])) {
                 this.isDragging = true
-                document.body.style.cursor = "grabbing"
-                document.addEventListener("mousemove", this.onDrag)
+                document.body.style.cursor = cursorStyleDragging
+                document.addEventListener("mousemove", callback)
                 document.addEventListener("mouseup", () => {
                     this.isDragging = false
                     document.body.style.cursor = "default"
-                    document.removeEventListener("mousemove", this.onDrag)
+                    document.removeEventListener("mousemove", callback)
                 })
             }
         })
     }
 
-    onDrag(e) {
+    onRadiusDrag(e) {
         const adjacent = e.pageX - this.centerX
         const opposite = this.centerY - e.pageY
+
         // Q1 adjacent+ opposite+
         // Q2 adjacent- opposite+ -> Add 1 * Math.PI / 2
         // Q3 adjacent- opposite- -> Add 2 * Math.PI / 2
@@ -277,6 +292,14 @@ class Drawing {
         } else if (q4) {
             this.update(3 * Math.PI / 2 + Math.PI / 2 - angle)
         }
+    }
+
+    onCentreDrag() {
+        console.log("Dragging centre")
+    }
+
+    onSizeDrag() {
+        console.log("Dragging size")
     }
 
     addPoint(x, y) {
