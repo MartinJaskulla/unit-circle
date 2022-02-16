@@ -292,8 +292,11 @@ class Drawing {
         }
     }
 
-    onCentreDrag() {
-        console.log("Dragging centre")
+    onCentreDrag(e) {
+        ctx.translate(e.pageX - this.centerX, e.pageY - this.centerY)
+        this.centerX = e.pageX
+        this.centerY = e.pageY
+        this.update(this.theta)
     }
 
     onSizeDrag() {
