@@ -5,10 +5,12 @@ canvas.width = canvas.parentElement.offsetWidth;
 canvas.height = canvas.parentElement.offsetHeight;
 
 function mapInfinityX(value) {
+    // Drawing further than canvas edge, because the text of the segment e.g. tangent is displayed half way
     return Math.abs(value) === Infinity ? Math.sign(value) * canvas.width * 100 : value
 }
 
 function mapInfinityY(value) {
+    // Drawing further than canvas edge, because the text of the segment e.g. cotangent is displayed half way
     return Math.abs(value) === Infinity ? Math.sign(value) * canvas.height * 100 : value
 }
 
@@ -17,12 +19,10 @@ function twoDecimals(number) {
 }
 
 /*
-TODO Support negative angles (dragging clockwise). Need to know the previous angle. If we went from 0 to 359, then we have negative angle
-- https://www.desmos.com/calculator/n0m5r4rjha
-- Bigger inner circle with angle value
-- Add arrowhead
-- Or instead of "θ" show a "k" which stands for completed full rotations
-- Settings menu to show, hide, copy values, segments
+TODO
+ - Support negative angles (dragging clockwise). Need to know the previous angle. If we went from 0 to 359, then we have negative angle
+ - Add arrowhead
+ - Settings menu to show, hide, copy values, segments
 */
 
 class Drawing {
@@ -158,10 +158,8 @@ class Drawing {
         ctx.strokeStyle = this.colors.radius;
         ctx.arc(0, 0, this.angleRadius * this.scale, -this.theta % (2 * Math.PI), 0,);
         ctx.stroke();
-        // TODO Theta text / valuehas to be rendered above all segments like here: https://www.desmos.com/calculator/n0m5r4rjha
-        // TODO Change scale of drawing by dragging the right point like here https://www.desmos.com/calculator/n0m5r4rjha
         // Rotation: When the radius is at 0 degrees, we want 90 degree rotation. 0 -> 90, 90 -> 45, 180 -> 0, 270 -> -45, 360 -> -90. So we start at 90 degree rotation and subtract half the angle of the radius.
-        this.drawSegmentText([Math.cos(this.theta / 2) * this.scale * this.angleRadius, -Math.sin(this.theta / 2) * this.scale * this.angleRadius], Math.PI / 2 - this.theta / 2, [0, -15], "θ", "black")
+        this.drawSegmentText([Math.cos(this.theta / 2) * this.scale * this.angleRadius, -Math.sin(this.theta / 2) * this.scale * this.angleRadius], Math.PI / 2 - this.theta / 2, [0, -15], twoDecimals(this.theta), "black")
         ctx.restore()
     }
 
@@ -323,7 +321,6 @@ class Drawing {
         ctx.restore()
     }
 
-    // TODO Centre point should drag whole circle
     drawAnglePoints() {
         // Drag handle
         this.addPoint(this.$cos, -this.$sin)
