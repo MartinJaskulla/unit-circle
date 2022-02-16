@@ -20,7 +20,7 @@ function twoDecimals(number) {
 
 /*
 TODO
- - Support negative angles (dragging clockwise). Need to know the previous angle. If we went from 0 to 359, then we have negative angle
+ - Support negative angles (dragging clockwise). Need to know the previous angle. If we went from 0 to 359, then we have negative angle. I can use mouseEvent.movementY
  - Add arrowhead
  - Settings menu to show, hide, copy values, segments
 */
@@ -299,8 +299,9 @@ class Drawing {
         this.update(this.theta)
     }
 
-    onSizeDrag() {
-        console.log("Dragging size")
+    onSizeDrag(e) {
+        e.movementY < 1 ? this.scale+=3 : this.scale-=3
+        this.update(this.theta)
     }
 
     addPoint(x, y) {
