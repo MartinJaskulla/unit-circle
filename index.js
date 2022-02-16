@@ -238,33 +238,33 @@ class Drawing {
         const centreDrag = [() => [0, 0], "move", "move", this.onCentreDrag]
         const sizeDrag = [() => [this.$radius, 0], "ns-resize", "ns-resize", this.onSizeDrag]
 
-        this.addDragEvents(...radiusDrag)
-        // this.addDragEvents(...centreDrag)
-        // this.addDragEvents(...sizeDrag)
-    }
+        const points = [radiusDrag, centreDrag, sizeDrag]
 
-    addDragEvents(getPoint, cursorStyleHover, cursorStyleDragging, callback) {
-        document.addEventListener("mousemove", e => {
-            if (this.isDragging) return
-            if (this.isNear(getPoint(), [e.pageX, e.pageY])) {
-                document.body.style.cursor = cursorStyleHover
-            } else {
-                // TODO Only if not near any of the 3. Maybe a field on the class dragPoints=[x,y,callback]
-                document.body.style.cursor = "default"
-            }
-        })
+        points.forEach(([getPoint, cursorStyleHover, cursorStyleDragging, callback]) => {
+            document.addEventListener("mousemove", e => {
+                if (this.isDragging) return
+                if (this.isNear(getPoint(), [e.pageX, e.pageY])) {
+                    document.body.style.cursor = cursorStyleHover
+                } else {
+                    const isNearAnyPoint = points.reduce((isNear, point) => this.isNear(point[0](), [e.pageX, e.pageY]) || isNear, false)
+                    if (!isNearAnyPoint) {
+                        document.body.style.cursor = "default"
+                    }
+                }
+            })
 
-        document.addEventListener("mousedown", e => {
-            if (this.isNear(getPoint(), [e.pageX, e.pageY])) {
-                this.isDragging = true
-                document.body.style.cursor = cursorStyleDragging
-                document.addEventListener("mousemove", callback)
-                document.addEventListener("mouseup", () => {
-                    this.isDragging = false
-                    document.body.style.cursor = "default"
-                    document.removeEventListener("mousemove", callback)
-                })
-            }
+            document.addEventListener("mousedown", e => {
+                if (this.isNear(getPoint(), [e.pageX, e.pageY])) {
+                    this.isDragging = true
+                    document.body.style.cursor = cursorStyleDragging
+                    document.addEventListener("mousemove", callback)
+                    document.addEventListener("mouseup", () => {
+                        this.isDragging = false
+                        document.body.style.cursor = "default"
+                        document.removeEventListener("mousemove", callback)
+                    })
+                }
+            })
         })
     }
 
