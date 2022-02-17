@@ -1,3 +1,8 @@
+/*
+TODO
+ - Fix: If the angle is 0, radius and sizeDrag are selected at the same time
+*/
+
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
@@ -17,13 +22,6 @@ function mapInfinityY(value) {
 function twoDecimals(number) {
     return number.toString().slice(0, number < 0 ? 5 : 4)
 }
-
-/*
-TODO
- - Support negative angles (dragging clockwise). Need to know the previous angle. If we went from 0 to 359, then we have negative angle. I can use mouseEvent.movementY
- - Add arrowhead
- - Settings menu to show, hide, copy values, segments
-*/
 
 class Drawing {
     radius = 1
@@ -272,6 +270,8 @@ class Drawing {
         const adjacent = e.pageX - this.centerX
         const opposite = this.centerY - e.pageY
 
+        const angle = Math.abs(Math.atan(opposite / adjacent))
+
         // Q1 adjacent+ opposite+
         // Q2 adjacent- opposite+ -> Add 1 * Math.PI / 2
         // Q3 adjacent- opposite- -> Add 2 * Math.PI / 2
@@ -280,7 +280,6 @@ class Drawing {
         const q2 = adjacent < 0 && opposite > 0
         const q3 = adjacent < 0 && opposite < 0
         const q4 = adjacent > 0 && opposite < 0
-        const angle = Math.abs(Math.atan(opposite / adjacent))
         if (q1) {
             this.update(angle)
         } else if (q2) {
@@ -300,7 +299,7 @@ class Drawing {
     }
 
     onSizeDrag(e) {
-        e.movementY < 1 ? this.scale+=3 : this.scale-=3
+        e.movementY < 1 ? this.scale += 3 : this.scale -= 3
         this.update(this.theta)
     }
 
@@ -335,4 +334,4 @@ class Drawing {
     }
 }
 
-console.log(new Drawing(Math.PI / 3))
+new Drawing(Math.PI / 3)
