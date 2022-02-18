@@ -1,6 +1,7 @@
 /*
 TODO
  - Fix: If the angle is 0, radius and sizeDrag are selected at the same time
+ - Consider device width in scale of circle and add mobile touch events
 */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -256,18 +257,20 @@ class Drawing {
                 }
             })
 
-            document.addEventListener("mousedown", e => {
+            const listener = (e, draggingEvent, doneDraggingEvent) => {
                 if (this.isNear(getPoint(), [e.pageX, e.pageY])) {
                     this.isDragging = true
                     document.body.style.cursor = cursorStyleDragging
-                    document.addEventListener("mousemove", callback)
-                    document.addEventListener("mouseup", () => {
+                    document.addEventListener(draggingEvent, callback)
+                    document.addEventListener(doneDraggingEvent, () => {
                         this.isDragging = false
                         document.body.style.cursor = "default"
-                        document.removeEventListener("mousemove", callback)
+                        document.removeEventListener(draggingEvent, callback)
                     })
                 }
-            })
+            }
+            document.addEventListener("mousedown", e => listener(e, "mousemove", "mouseup"))
+            document.addEventListener("touchstart", e => listener(e, "touchmove", "touchend"))
         })
     }
 
