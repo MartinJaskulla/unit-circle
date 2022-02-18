@@ -20,7 +20,8 @@ function mapInfinityY(value) {
 }
 
 function twoDecimals(number) {
-    return number.toString().slice(0, number < 0 ? 5 : 4)
+    // .slice needs to consider negative symbol
+    return parseFloat(number.toFixed(10)).toString().slice(0, number < 0 ? 5 : 4)
 }
 
 class Drawing {
