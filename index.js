@@ -1,7 +1,6 @@
 /*
 TODO
  - Fix: If the angle is 0, radius and sizeDrag are selected at the same time
- - Consider device width in scale of circle and add mobile touch events
 */
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -105,7 +104,7 @@ class Drawing {
         canvas.height = canvas.parentElement.offsetHeight;
         this.centerX = canvas.width / 2
         this.centerY = canvas.height / 2
-        this.scale = canvas.height / 3.5
+        this.scale = (canvas.width + canvas.height) / 9
 
         this.onRadiusDrag = this.onRadiusDrag.bind(this)
         this.onCentreDrag = this.onCentreDrag.bind(this)
