@@ -334,4 +334,27 @@ class Drawing {
     }
 }
 
-new Drawing(Math.PI / 3)
+const drawing = new Drawing(0)
+
+const overshoot = Math.PI / 3
+const settle = Math.PI / 4
+function grow() {
+    if (drawing.theta > overshoot) {
+        requestAnimationFrame(shrink)
+        return
+    }
+    drawing.update(drawing.theta + 0.025)
+    requestAnimationFrame(grow);
+}
+
+function shrink() {
+    if (drawing.theta < settle) {
+        drawing.update( settle)
+        return
+    }
+    drawing.update(drawing.theta - 0.025)
+    requestAnimationFrame(shrink);
+}
+
+requestAnimationFrame(grow);
+
