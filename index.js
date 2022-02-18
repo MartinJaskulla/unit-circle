@@ -1,50 +1,32 @@
 /*
 TODO
  - Fix: If the angle is 0, radius and sizeDrag are selected at the same time
- - Adapt if window size changes
 */
-const angleInput = document.querySelector("form#angleForm input")
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+let drawing
 
-canvas.width = canvas.parentElement.offsetWidth;
-canvas.height = canvas.parentElement.offsetHeight;
-
+const angleInput = document.querySelector("form#angleForm input")
 document.forms.angleForm.addEventListener("submit", (e) => {
     e.preventDefault()
     const newAngle = Number(eval(angleInput.value))
     const isValidNumber = typeof newAngle === "number" && !isNaN(newAngle)
-    if(isValidNumber) {
+    if (isValidNumber) {
         drawing.update(newAngle)
     } else {
         // Error message
     }
 })
 
-function mapInfinityX(value) {
-    // Drawing further than canvas edge, because the text of the segment e.g. tangent is displayed half way
-    return Math.abs(value) === Infinity ? Math.sign(value) * canvas.width * 100 : value
-}
-
-function mapInfinityY(value) {
-    // Drawing further than canvas edge, because the text of the segment e.g. cotangent is displayed half way
-    return Math.abs(value) === Infinity ? Math.sign(value) * canvas.height * 100 : value
-}
-
-function twoDecimals(number) {
-    // .slice needs to consider negative symbol
-    return parseFloat(number.toFixed(10)).toString().slice(0, number < 0 ? 5 : 4)
-}
-
 class Drawing {
+    scale
+    centerX
+    centerY
     radius = 1
     angleRadius = 0.15
     pointRadius = 2
     dragArea = 10
     isDragging = false
-    scale = canvas.height / 3.5
-    centerX = canvas.width / 2
-    centerY = canvas.height / 2
     colors = {
         sin: "#1a6ccb",
         sec: '#15c219',
@@ -58,7 +40,7 @@ class Drawing {
         cartesianPlane: 1,
         circle: 3,
     }
-    transparency = 0.5
+    coSegmentTransparency = 0.5
     theta = 0
 
     get coTheta() {
@@ -118,10 +100,17 @@ class Drawing {
     }
 
     constructor(angle) {
+        canvas.width = canvas.parentElement.offsetWidth;
+        canvas.height = canvas.parentElement.offsetHeight;
+        this.centerX = canvas.width / 2
+        this.centerY = canvas.height / 2
+        this.scale = canvas.height / 3.5
+
         this.onRadiusDrag = this.onRadiusDrag.bind(this)
         this.onCentreDrag = this.onCentreDrag.bind(this)
         this.onSizeDrag = this.onSizeDrag.bind(this)
         this.addDragToPoints = this.addDragToPoints.bind(this)
+
         // Place (0,0) at center of canvas
         ctx.translate(this.centerX, this.centerY)
         this.update(angle)
@@ -213,7 +202,7 @@ class Drawing {
     }
 
     drawCosine() {
-        this.drawSegment([0, -this.$sin], [this.$cos, -this.$sin], this.colors.sin, this.thickness.segments, this.transparency)
+        this.drawSegment([0, -this.$sin], [this.$cos, -this.$sin], this.colors.sin, this.thickness.segments, this.coSegmentTransparency)
         if (this.cos !== 0) this.drawSegmentText([this.$cos / 2, -this.$sin], 0, this.sin >= 0 ? [0, -15] : [0, 15], `cosine (${twoDecimals(this.cos)})`, this.colors.sin)
     }
 
@@ -223,7 +212,7 @@ class Drawing {
     }
 
     drawCosecant() {
-        this.drawSegment([0, 0], [0, -this.$csc], this.colors.sec, this.thickness.segments, this.transparency)
+        this.drawSegment([0, 0], [0, -this.$csc], this.colors.sec, this.thickness.segments, this.coSegmentTransparency)
         if (this.csc !== 0) this.drawSegmentText([0, -this.$csc / 2], this.cos >= 0 ? -Math.PI / 2 : Math.PI / 2, [0, -15], `cosecant (${twoDecimals(this.csc)})`, this.colors.sec)
     }
 
@@ -233,7 +222,7 @@ class Drawing {
     }
 
     drawCotangent() {
-        this.drawSegment([this.$cos, -this.$sin], [0, -this.$csc], this.colors.tan, this.thickness.segments, this.transparency)
+        this.drawSegment([this.$cos, -this.$sin], [0, -this.$csc], this.colors.tan, this.thickness.segments, this.coSegmentTransparency)
         if (this.cot !== 0) this.drawSegmentText([this.$cos / 2, (-this.$sin - this.$csc) / 2], this.coTheta, [0, -30], `cotangent (${twoDecimals(this.cot)})`, this.colors.tan)
     }
 
@@ -350,7 +339,8 @@ class Drawing {
     }
 }
 
-const drawing = new Drawing(0)
+drawing = new Drawing(0)
+window.addEventListener('resize', (event) => drawing = new Drawing(drawing.theta));
 
 const overshoot = Math.PI / 3
 const settle = Math.PI / 4
@@ -376,3 +366,17 @@ function shrink() {
 
 requestAnimationFrame(grow);
 
+function mapInfinityX(value) {
+    // Drawing further than canvas edge, because the text of the segment e.g. tangent is displayed half way
+    return Math.abs(value) === Infinity ? Math.sign(value) * canvas.width * 100 : value
+}
+
+function mapInfinityY(value) {
+    // Drawing further than canvas edge, because the text of the segment e.g. cotangent is displayed half way
+    return Math.abs(value) === Infinity ? Math.sign(value) * canvas.height * 100 : value
+}
+
+function twoDecimals(number) {
+    // .slice needs to consider negative symbol
+    return parseFloat(number.toFixed(10)).toString().slice(0, number < 0 ? 5 : 4)
+}
