@@ -8,6 +8,11 @@ body {
     font-family: sans-serif;
 }
 
+canvas#canvas {
+    /*Safari*/
+    position: absolute;
+}
+
 form#angleForm {
     position: fixed;
     left: 50%;
