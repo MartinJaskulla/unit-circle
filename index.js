@@ -1,13 +1,25 @@
 /*
 TODO
  - Fix: If the angle is 0, radius and sizeDrag are selected at the same time
+ - Adapt if window size changes
 */
-
+const angleInput = document.querySelector("form#angleForm input")
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 canvas.width = canvas.parentElement.offsetWidth;
 canvas.height = canvas.parentElement.offsetHeight;
+
+document.forms.angleForm.addEventListener("submit", (e) => {
+    e.preventDefault()
+    const newAngle = Number(eval(angleInput.value))
+    const isValidNumber = typeof newAngle === "number" && !isNaN(newAngle)
+    if(isValidNumber) {
+        drawing.update(newAngle)
+    } else {
+        // Error message
+    }
+})
 
 function mapInfinityX(value) {
     // Drawing further than canvas edge, because the text of the segment e.g. tangent is displayed half way
@@ -116,6 +128,7 @@ class Drawing {
         this.addDragToPoints()
     }
 
+    // Maybe put in requestAnimationFrame
     update(angle) {
         this.theta = angle
         ctx.clearRect(-this.centerX, -this.centerY, canvas.width, canvas.height);
@@ -131,6 +144,7 @@ class Drawing {
         this.drawRadius(this.$cos, -this.$sin)
         this.drawRadius(this.$radius, 0)
         this.drawAnglePoints()
+        angleInput.value = this.theta
     }
 
     drawCartesianPlane() {
@@ -159,6 +173,7 @@ class Drawing {
         ctx.stroke();
         // Rotation: When the radius is at 0 degrees, we want 90 degree rotation. 0 -> 90, 90 -> 45, 180 -> 0, 270 -> -45, 360 -> -90. So we start at 90 degree rotation and subtract half the angle of the radius.
         this.drawSegmentText([Math.cos(this.theta / 2) * this.scale * this.angleRadius, -Math.sin(this.theta / 2) * this.scale * this.angleRadius], Math.PI / 2 - this.theta / 2, [0, -15], twoDecimals(this.theta), "black")
+        this.drawSegmentText([Math.cos(this.theta / 2) * this.scale * this.angleRadius, -Math.sin(this.theta / 2) * this.scale * this.angleRadius], Math.PI / 2 - this.theta / 2, [0, 15], "θ", "black")
         ctx.restore()
     }
 
@@ -339,6 +354,7 @@ const drawing = new Drawing(0)
 
 const overshoot = Math.PI / 3
 const settle = Math.PI / 4
+
 function grow() {
     if (drawing.theta > overshoot) {
         requestAnimationFrame(shrink)
@@ -350,7 +366,8 @@ function grow() {
 
 function shrink() {
     if (drawing.theta < settle) {
-        drawing.update( settle)
+        drawing.update(settle)
+        angleInput.value = "Math.PI / 4"
         return
     }
     drawing.update(drawing.theta - 0.025)
