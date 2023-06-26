@@ -5,7 +5,6 @@ html, body {
 
 body {
     height: 100vh;
-    font-family: sans-serif;
 }
 
 canvas#canvas {
@@ -20,13 +19,11 @@ form#angleForm {
     bottom: 5%;
 }
 
-form#angleForm label span{
-    font-size: 0.9rem;
+form#angleForm label span {
     background: white;
     position: absolute;
     top: -8px;
     left: 20px;
-    display: block;
     padding: 0 3px;
 }
 
