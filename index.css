@@ -8,7 +8,7 @@ body {
 }
 
 canvas#canvas {
-    /*Safari*/
+    /* To prevent scroll bars */
     position: absolute;
 }
 
