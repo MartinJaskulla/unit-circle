@@ -9,12 +9,14 @@ let drawing
 const angleInput = document.querySelector("form#angleForm input")
 document.forms.angleForm.addEventListener("submit", (e) => {
     e.preventDefault()
-    const newAngle = Number(eval(angleInput.value))
-    const isValidNumber = typeof newAngle === "number" && !isNaN(newAngle)
-    if (isValidNumber) {
+    try {
+        // Running eval on user input ⚠️
+        const newAngle = Number(eval(angleInput.value))
+        const isValidNumber = typeof newAngle === "number" && !isNaN(newAngle)
+        if (!isValidNumber) throw new Error()
         drawing.update(newAngle)
-    } else {
-        // Error message
+    } catch (e) {
+        alert('Enter a number or a JavaScript expression that evaluates to a number.')
     }
 })
 
