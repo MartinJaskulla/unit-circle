@@ -243,15 +243,15 @@ class Drawing {
         const centreDrag = [() => [0, 0], "move", "move", this.onCentreDrag]
         const sizeDrag = [() => [this.$radius, 0], "ns-resize", "ns-resize", this.onSizeDrag]
 
-        const points = [radiusDrag, centreDrag, sizeDrag]
+        const dragHandles = [radiusDrag, centreDrag, sizeDrag]
 
-        points.forEach(([getPoint, cursorStyleHover, cursorStyleDragging, callback]) => {
+        dragHandles.forEach(([getPoint, cursorStyleHover, cursorStyleDragging, callback]) => {
             document.addEventListener("mousemove", e => {
                 if (this.isDragging) return
                 if (this.isNear(getPoint(), [e.pageX, e.pageY])) {
                     document.body.style.cursor = cursorStyleHover
                 } else {
-                    const isNearAnyPoint = points.reduce((isNear, point) => this.isNear(point[0](), [e.pageX, e.pageY]) || isNear, false)
+                    const isNearAnyPoint = dragHandles.reduce((isNear, point) => this.isNear(point[0](), [e.pageX, e.pageY]) || isNear, false)
                     if (!isNearAnyPoint) {
                         document.body.style.cursor = "default"
                     }
