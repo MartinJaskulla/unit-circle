@@ -1,7 +1,3 @@
-/*
-TODO
- - Fix: If the angle is 0, radius and sizeDrag are selected at the same time
-*/
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 let drawing
@@ -28,7 +24,6 @@ class Drawing {
     angleRadius = 0.15
     pointRadius = 2
     dragArea = 10
-    isDragging = false
     colors = {
         sin: "#1a6ccb",
         sec: '#15c219',
@@ -239,36 +234,48 @@ class Drawing {
     }
 
     addDragToPoints() {
-        const radiusDrag = [() => [this.$cos, this.$sin], "grab", "grabbing", this.onRadiusDrag]
-        const centreDrag = [() => [0, 0], "move", "move", this.onCentreDrag]
+        const angleDrag = [() => [this.$cos, this.$sin], "grab", "grabbing", this.onRadiusDrag]
+        const positionDrag = [() => [0, 0], "move", "move", this.onCentreDrag]
         const sizeDrag = [() => [this.$radius, 0], "ns-resize", "ns-resize", this.onSizeDrag]
 
-        const dragHandles = [radiusDrag, centreDrag, sizeDrag]
+        const dragHandles = [angleDrag, positionDrag, sizeDrag]
 
-        dragHandles.forEach(([getPoint, cursorStyleHover, cursorStyleDragging, callback]) => {
+        let isDragging = null
+        let specialCursorStyleOf = null
+
+        dragHandles.forEach((dragHandle) => {
+            const [getPoint, cursorStyleHover, cursorStyleDragging, callback] = dragHandle
             document.addEventListener("mousemove", e => {
-                if (this.isDragging) return
+                if (isDragging) return
                 if (this.isNear(getPoint(), [e.pageX, e.pageY])) {
+                    // In case two drag handles are near,
+                    // only the first style should be applied.
+                    if(specialCursorStyleOf) return
                     document.body.style.cursor = cursorStyleHover
+                    specialCursorStyleOf = dragHandle
                 } else {
-                    const isNearAnyPoint = dragHandles.reduce((isNear, point) => this.isNear(point[0](), [e.pageX, e.pageY]) || isNear, false)
-                    if (!isNearAnyPoint) {
+                    // Only reset its own cursor style. Do not reverse the cursor style of another drag handle
+                    if (specialCursorStyleOf === dragHandle) {
                         document.body.style.cursor = "default"
+                        specialCursorStyleOf = null
                     }
                 }
             })
 
             const listener = (e, draggingEvent, doneDraggingEvent) => {
-                if (this.isNear(getPoint(), [e.pageX, e.pageY])) {
-                    this.isDragging = true
-                    document.body.style.cursor = cursorStyleDragging
-                    document.addEventListener(draggingEvent, callback)
-                    document.addEventListener(doneDraggingEvent, () => {
-                        this.isDragging = false
-                        document.body.style.cursor = "default"
-                        document.removeEventListener(draggingEvent, callback)
-                    })
-                }
+                // There should only be one active drag handle at any time. If the angle is zero,
+                // the angle and size drag are in the same place. Clicking on both and having the mouse
+                // movement change angle and size at the same time must be prevented.
+                if (isDragging) return
+                if (!this.isNear(getPoint(), [e.pageX, e.pageY])) return;
+                isDragging = true
+                document.body.style.cursor = cursorStyleDragging
+                document.addEventListener(draggingEvent, callback)
+                document.addEventListener(doneDraggingEvent, () => {
+                    isDragging = false
+                    document.body.style.cursor = "default"
+                    document.removeEventListener(draggingEvent, callback)
+                })
             }
             document.addEventListener("mousedown", e => listener(e, "mousemove", "mouseup"))
             document.addEventListener("touchstart", e => listener(e, "touchmove", "touchend"))
